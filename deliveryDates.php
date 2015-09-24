@@ -2,9 +2,9 @@
 date_default_timezone_set('America/Toronto');
 require('psysh');
 function timestamp_diff($timestamp_1, $timestamp_2)
-    {
-     return abs($timestamp_1 - $timestamp_2)/60/60/24;
-    }
+{
+   return abs($timestamp_1 - $timestamp_2)/60/60/24;
+}
 class deliveryDates {
 
 	/** Properties **/
@@ -38,7 +38,12 @@ class deliveryDates {
         while (count($available_dates) <= $number_of_dates) {
             $comparison_date = strtotime('+1 day', $comparison_date);
             if (date('N', $comparison_date) == 1 && ($this->has_missed_cutoff($comparison_date) == false)) {
-                array_push($available_dates, new DateTime("@$comparison_date"));
+                array_push($available_dates, 
+                    array(
+                        "timestamp" => @$comparison_date,
+                        "cutoff" => 'test cutoff'
+                        )
+                    );
             }
         }
         
@@ -59,14 +64,14 @@ class deliveryDates {
 ?>
 <html>
 <body>
-<p>
-	<strong>Next 2 available delivery dates:</strong><br />
-	<ul>
-		<?php foreach(deliveryDates::getInstance()->get_available_dates() as $date): ?>
+    <p>
+       <strong>Next 2 available delivery dates:</strong><br />
+       <ul>
+          <?php foreach(deliveryDates::getInstance()->get_available_dates() as $date): ?>
             
-            <li>Delivery on <?=date('Y-m-d',date_timestamp_get($date))?> with a cut-off time of <?=date('Y-m-d H:i:s',$date['cutoff'])?></li>      
-		<?php endforeach ?>
-	</ul>
+            <li>Delivery on <?=date('Y-m-d',$date['timestamp'])?> with a cut-off time of <?=date('Y-m-d H:i:s',$date['cutoff'])?></li>      
+        <?php endforeach ?>
+    </ul>
 </p>
 <p>
 	<strong>Have I missed the cutoff for delivery on 2015-09-28 ?</strong><br />
