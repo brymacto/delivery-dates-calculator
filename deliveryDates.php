@@ -5,15 +5,16 @@ require('psysh');
 
 function timestamp_diff($timestamp_1, $timestamp_2)
 {
- return abs($timestamp_1 - $timestamp_2)/60/60/24;
+// Returns in days
+   return abs($timestamp_1 - $timestamp_2)/60/60/24;
 }
 
 class deliveryDates {
 	/** Properties **/
 	private $available_dates = array();
-    private $blackout_dates = array();
+    public $blackout_dates = array();
 
-	public static function getInstance()
+    public static function getInstance()
     {
         static $instance = null;
         if (null === $instance) {
@@ -32,19 +33,27 @@ class deliveryDates {
         $blackout_dates = array(
             "start" => $blackout_start,
             "end" => $blackout_end
-            )
+            );
     }
 
-
+    public function update_blackout_with_string($string_start, $string_end) {
+        $this->update_blackout(strtotime($string_start),strtotime($string_end));
+    }
     public function update_blackout($blackout_start, $blackout_end)
     {
-        $blackout_dates['start'] = $blackout_start;
-        $blackout_dates['end'] = $blackout_end;
+        $this->blackout_dates['start'] = $blackout_start;
+        $this->blackout_dates['end'] = $blackout_end;
+        
     }
 
     public function is_in_blackout($delivery_date_timestamp)
     {
-        if ($delivery_date_timestamp > $blackout_dates['start']) && ($delivery_date_timestamp < $blackout_dates['end']) {
+        if (
+            ($this->blackout_dates['start'] != null) &&
+            ($this->blackout_dates['end'] != null) &&
+            ($delivery_date_timestamp > $this->blackout_dates['start']) && 
+            ($delivery_date_timestamp < $this->blackout_dates['end'])
+            ) {
             return true;
         } else {
             return false;
@@ -60,8 +69,11 @@ class deliveryDates {
         // eval(\Psy\sh());
         while (count($available_dates) < $number_of_dates) {
             $comparison_date = strtotime("+1 day", $comparison_date);
-            // Check if date is a Monday, if it hasn't missed cutoff, and if it's not in the blackout period.
-            if (date("N", $comparison_date) == 1 && ($this->has_missed_cutoff($comparison_date) == false)) {
+            if (
+                (date("N", $comparison_date) == 1) && 
+                ($this->has_missed_cutoff($comparison_date) == false) &&
+                ($this->is_in_blackout($comparison_date)) == false)
+                ) {
                 array_push($available_dates, 
                     array(
                         "timestamp" => $comparison_date,
@@ -86,17 +98,29 @@ class deliveryDates {
 <html>
 <body>
     <p>
-     <strong>Next 2 available delivery dates:</strong><br />
-     <ul>
-      <?php foreach(deliveryDates::getInstance()->get_available_dates() as $date): ?>
+       <strong>Next 2 available delivery dates:</strong><br />
+       <ul>
+          <?php foreach(deliveryDates::getInstance()->get_available_dates() as $date): ?>
 
-        <li>Delivery on <?=date('Y-m-d',$date['timestamp'])?> with a cut-off time of <?=date('Y-m-d',$date['cutoff'])?></li>      
-    <?php endforeach ?>
-</ul>
+            <li>Delivery on <?=date('Y-m-d',$date['timestamp'])?> with a cut-off time of <?=date('Y-m-d',$date['cutoff'])?></li>      
+        <?php endforeach ?>
+        
+    </ul>
 </p>
 <p>
 	<strong>Have I missed the cutoff for delivery on 2015-09-28 ?</strong><br />
 	<?=(deliveryDates::getInstance()->has_missed_cutoff(strtotime('2015-09-28')) ? 'Yes' : 'No')?>
 </p>
+
+<?php 
+
+$d = deliveryDates::getInstance();
+$d->update_blackout_with_string('2015-10-01', '2015-10-15');
+$sept24 = strtotime('2015-09-24');
+$oct10 = strtotime('2015-10-10');
+eval(\Psy\sh());
+
+
+?>
 </body>
 </html>
