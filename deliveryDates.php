@@ -66,13 +66,12 @@ class deliveryDates {
         $current_date = strtotime("now");
         $available_dates = array();
         $comparison_date = $current_date;
-        // eval(\Psy\sh());
         while (count($available_dates) < $number_of_dates) {
             $comparison_date = strtotime("+1 day", $comparison_date);
             if (
                 (date("N", $comparison_date) == 1) && 
                 ($this->has_missed_cutoff($comparison_date) == false) &&
-                ($this->is_in_blackout($comparison_date)) == false)
+                ($this->is_in_blackout($comparison_date) == false)
                 ) {
                 array_push($available_dates, 
                     array(
@@ -88,13 +87,16 @@ class deliveryDates {
 
     public function has_missed_cutoff($delivery_date_timestamp)
     {
-        $current_date = strtotime('now');
+        $current_date = strtotime('today midnight');
+
         return timestamp_diff($current_date, $delivery_date_timestamp) < 4;
     }
 }
 
 
 ?>
+
+
 <html>
 <body>
     <p>
@@ -112,15 +114,5 @@ class deliveryDates {
 	<?=(deliveryDates::getInstance()->has_missed_cutoff(strtotime('2015-09-28')) ? 'Yes' : 'No')?>
 </p>
 
-<?php 
-
-$d = deliveryDates::getInstance();
-$d->update_blackout_with_string('2015-10-01', '2015-10-15');
-$sept24 = strtotime('2015-09-24');
-$oct10 = strtotime('2015-10-10');
-eval(\Psy\sh());
-
-
-?>
 </body>
 </html>
