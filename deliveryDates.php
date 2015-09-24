@@ -1,5 +1,9 @@
 <?php
 date_default_timezone_set('America/Toronto');
+function timestamp_diff($timestamp_1, $timestamp_2)
+    {
+     return abs($timestamp_1 - $timestamp_2)/60/60/24;
+    }
 class deliveryDates {
 
 	/** Properties **/
@@ -31,8 +35,7 @@ class deliveryDates {
         $comparison_date = $current_date;
         while (count($available_dates) <= $number_of_dates) {
             $comparison_date = strtotime('+1 day', $comparison_date);
-            // if (date('N', $comparison_date) == 1 && (date_diff($current_date, $comparison_date) >= 4 )) {
-            if (date('N', $comparison_date) == 1) {
+            if (date('N', $comparison_date) == 1 && $this->has_missed_cutoff($comparison_date)) {
                 array_push($available_dates, $comparison_date);
             }
         }
@@ -41,9 +44,11 @@ class deliveryDates {
 
     }
 
+
     public function has_missed_cutoff($delivery_date_timestamp)
     {
-
+        $current_date = strtotime('now');
+        return timestamp_diff($current_date, $delivery_date_timestamp) < 4;
     }
 }
 
