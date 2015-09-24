@@ -9,7 +9,6 @@ function timestamp_diff($timestamp_1, $timestamp_2)
 }
 
 class deliveryDates {
-
 	/** Properties **/
 	private $available_dates = array();
     private $blackout_dates = array();
@@ -41,6 +40,16 @@ class deliveryDates {
     {
         $blackout_dates['start'] = $blackout_start;
         $blackout_dates['end'] = $blackout_end;
+    }
+
+    public function is_in_blackout($delivery_date_timestamp)
+    {
+        if ($delivery_date_timestamp > $blackout_dates['start']) && ($delivery_date_timestamp < $blackout_dates['end']) {
+            return true;
+        } else {
+            return false;
+        }
+
     }
 
     public function get_available_dates($number_of_dates = 2) /** We assume we want the next 2 dates, but we could ask for more **/
