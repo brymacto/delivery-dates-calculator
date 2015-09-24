@@ -54,7 +54,7 @@ class deliveryDates {
         return timestamp_diff($current_date, $delivery_date_timestamp) < 4;
     }
 }
-
+// eval(\Psy\sh())
 
 ?>
 <html>
@@ -63,8 +63,8 @@ class deliveryDates {
 	<strong>Next 2 available delivery dates:</strong><br />
 	<ul>
 		<?php foreach(deliveryDates::getInstance()->get_available_dates() as $date): ?>
-            <?php eval(\Psy\sh()); ?>
-            <li>Delivery on <?=date('Y-m-d',$date['timestamp'])?> with a cut-off time of <?=date('Y-m-d H:i:s',$date['cutoff'])?></li>      
+            
+            <li>Delivery on <?=date('Y-m-d',date_timestamp_get($date))?> with a cut-off time of <?=date('Y-m-d H:i:s',$date['cutoff'])?></li>      
 		<?php endforeach ?>
 	</ul>
 </p>
