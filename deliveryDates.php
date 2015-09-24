@@ -1,5 +1,5 @@
 <?php
-
+date_default_timezone_set('America/Toronto');
 class deliveryDates {
 
 	/** Properties **/
@@ -26,12 +26,13 @@ class deliveryDates {
 
     public function get_available_dates($number_of_dates = 2) /** We assume we want the next 2 dates, but we could ask for more **/
     {
-        $current_date = getdate(time());
+        $current_date = strtotime('now');
         $available_dates = array();
         $comparison_date = $current_date;
         while (count($available_dates) <= $number_of_dates) {
-            $comparison_date->modify('+1 day');
-            if ($comparison_date[wday] == 1 && (date_diff($current_date, $comparison_date) >= 4 )) {
+            $comparison_date = strtotime('+1 day', $comparison_date);
+            // if (date('N', $comparison_date) == 1 && (date_diff($current_date, $comparison_date) >= 4 )) {
+            if (date('N', $comparison_date) == 1) {
                 array_push($available_dates, $comparison_date);
             }
         }
