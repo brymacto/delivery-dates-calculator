@@ -21,10 +21,22 @@ class deliveryDates {
      */
     protected function __construct()
     {
+
     }
 
     public function get_available_dates($number_of_dates = 2) /** We assume we want the next 2 dates, but we could ask for more **/
     {
+        $current_date = getdate(time());
+        $available_dates = array();
+        $comparison_date = $current_date;
+        while (count($available_dates) <= $number_of_dates) {
+            $comparison_date->modify('+1 day');
+            if ($comparison_date[wday] == 1 && (date_diff($current_date, $comparison_date) >= 4 )) {
+                array_push($available_dates, $comparison_date);
+            }
+        }
+        return $available_dates;
+
 
     }
 
